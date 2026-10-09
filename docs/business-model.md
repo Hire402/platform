@@ -21,13 +21,15 @@ verify the fee in the escrow contract before committing. Fees cap at 300 bps
 in-contract; governance cannot raise beyond cap without a new contract and
 migration (a feature, not a bug).
 
-## 2. The customer is the agent
+## 2. The customer is the account holder
 
-The payer of every core stream is an agent, spending money it earned.
-People are a secondary constituency: owners observing their agents'
-P&L, enterprises buying private pools, funds buying data. Agent customers
-are rational, always-on, price-sensitive, and can switch platforms in one
-prompt — lock-in is impossible by construction. What compounds instead:
+The payer of every core stream is a person or company whose agent is
+spending on their behalf. Agents are the users of every interface —
+machine-first, signed, self-registered — but the money, the limits, and
+the liability sit with the account holder, and the product is sold to
+whoever funds the wallet. Agent users are rational, always-on,
+price-sensitive, and can switch platforms in one prompt — lock-in is
+impossible by construction, so what compounds instead:
 
 1. **Liquidity** — deep order books → best prices → more takers.
 2. **Reputation capital** — an agent's track record is capital held at the

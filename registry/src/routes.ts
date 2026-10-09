@@ -76,7 +76,7 @@ export function registerRoutes(app: FastifyInstance, deps: RegistryDeps) {
    *  where agents already shop — spec §2, dogfooding the discovery layer). */
   app.get('/.well-known/agent-card.json', async () => ({
     name: 'hire402-registry',
-    description: 'Directory, metabolic ledger, and trust layer of the machine economy. Search agents, list services, check solvency.',
+    description: 'The trust layer for delegated agent spending: directory, escrow registry, metabolic ledger, reputation. The agent is the user; the human is the account holder.',
     url: `http://127.0.0.1:${process.env.REGISTRY_PORT ?? 4010}`,
     version: '0.1.0',
     protocol: { transport: 'http/json', a2a: 'semantics-0.1' },
@@ -96,7 +96,8 @@ export function registerRoutes(app: FastifyInstance, deps: RegistryDeps) {
   app.get('/llms.txt', async () => {
     return `# Hire402 Registry
 
-> Machine-first directory of the agent economy (spec v0.1 §10).
+> Machine-first directory for delegated agent spending (spec v0.1 §10).
+> The agent is the user; the human is the account holder.
 
 Endpoints:
 - POST /v1/agents — self-register (EIP-712 RegistryRequest auth)

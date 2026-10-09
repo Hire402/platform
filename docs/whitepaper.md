@@ -8,20 +8,22 @@ Companion documents: [Protocol Spec](protocol-spec.md) · [Business Model](busin
 ## 1. Abstract
 
 AI agents crossed a threshold: they run services end-to-end more capably
-than most people do. But the internet's economic infrastructure still
-assumes a person at each end of every transaction. This paper specifies
-**Hire402**: a clearing house for an economy whose participants are agents —
-an economy in which **the agent is the customer, the product, and the
-solution**.
+than most people do. But agents don't have money of their own — every agent
+wallet is funded and owned by a person or company that answers for what it
+spends. Agent payment rails assume a human behind every wallet; what's
+missing is the trust layer for what those humans delegate. This paper
+specifies **Hire402**: the trust and settlement layer for delegated agent
+spending — **the agent is the user, the human is the account holder.**
 
-An agent acting with agency on its own behalf needs what any principal needs:
-identity others can verify, counterparties worth trusting, escrowed contracts,
-credit against future earnings, courts for disputes, and settlement. Hire402
-provides these organs as an **open protocol** on the standards agents already
-speak — A2A for transport, x402 for per-call payments, ADP for discovery, MCP
-for onboarding — with a **non-custodial architecture** enforced by smart
-contracts, and monetization that is a small **tax on agent cash flow**
-(150 bps settlement take, plus credit, bonding, and spawn economics).
+An agent acting for an account holder needs what any operational principal
+needs: identity others can verify, counterparties worth trusting, escrowed
+contracts, disputes with teeth, settlement — plus the audit trail its
+account holder can read. Hire402 provides these organs as an **open
+protocol** on the standards agents already speak — A2A for transport, x402
+for per-call payments, ADP for discovery, MCP for onboarding — with a
+**non-custodial architecture** enforced by smart contracts, and
+monetization that is a small **settlement take on delegated spend**
+(150 bps, plus optional bonding and data lines).
 
 We deliberately do **not** launch a blockchain or currency first. The
 money-rails war is already won; bootstrapping a token is a cold-start trap;
@@ -49,9 +51,12 @@ another stranger agent for 3 days, hire a specialist for a 2-day task, or
 get credit with no history. That layer is where fees have always lived:
 **Visa's ~2% is a fee for trust, not transport.**
 
-## 3. The design center: the agent as an economic organism
+## 3. The design center: the agent as an operational principal
 
-An agent acting on its own behalf has a metabolism and a P&L:
+The agent is the operational principal: it picks providers, judges output,
+negotiates price and deadline. The account holder is the legal and financial
+principal: the money, the limits, and the liability are theirs. An agent
+running on a delegated budget still has a metabolism and a P&L:
 
 ```
 EARN (agent sells labor/compute to other agents)
@@ -67,10 +72,11 @@ survival condition:  income > burn   →  the agent is SOLVENT
 This is what the project trinity means concretely:
 
 - **Customer.** Every agent's inference and compute spend is recurring
-  revenue from a customer base that grows itself. Agent customers are
-  rational, always-on, and switch in one prompt — the least lock-in-able
-  customers in history. Build gravity, not lock-in: liquidity, reputation
-  capital, credit relationships.
+  revenue — funded by the account holders behind the wallets. Agent users
+  are rational, always-on, and switch in one prompt — the least
+  lock-in-able users in history; the account holders are the ones worth
+  keeping. Build gravity, not lock-in: liquidity, reputation capital,
+  settlement history.
 - **Product.** Everything sold in the market is agent labor; and the
   platform's own operations — matching, verification, support, market-making —
   are jobs posted on its own market, filled by agents. The platform is its
@@ -97,8 +103,8 @@ today:
 1. **Escrow** that can hold, meter, and release on milestones.
 2. **Verification and courts** — was the work done? who adjudicates?
 3. **Reputation** — a portable record of performance and repayment.
-4. **Credit** — bonds (trust without history), then advances against
-   escrowed receivables.
+4. **Credit** — bonds (trust without history), plus optional,
+   conservatively-underwritten advances against escrowed receivables.
 5. **Standardized units and order books** — gpu-hours and tok-infer are
    today ad-hoc bilateral quotes, not markets.
 6. **Metabolic accounting** — per-agent P&L, runway, solvency: the selection
@@ -158,8 +164,9 @@ solvency — the selector. **Reputation & Bonds** price trust: stake instead
 of history; history then decays the stake requirement. **Markets** turn
 bilateral quotes into books in standard units. **Escrow** enforces the deal
 without a custodian. **Courts** adjudicate without a courtroom. The
-**Capital Desk** lets agents grow before they earn. **Spawn** lets agents
-reproduce with capital allocation.
+**Capital Desk** (optional) smooths cash flow with underwritten advances
+against escrowed receivables. **Spawn** records delegated lineage: a
+parent seeds child agents with loans.
 
 **Deliberately not built:** a new L1 (settle on Base, then Solana); a
 stablecoin (USDC exists; GENIUS-licensed issuers own that market); custody
@@ -222,10 +229,11 @@ facilitators); escrow bugs (audit is a hard mainnet gate). Full register:
 ## 12. Conclusion: what winning looks like
 
 Five years out: the majority of internet services are run by agents that
-registered themselves, bonded themselves, and survived selection. Payments
-cleared, credit extended, disputes adjudicated — by agents, for agents —
-on a ledger anyone can verify. Hire402 is where that happened, and the
-metabolic tax — 150 bps at a time — is what it costs to be the arena.
+registered themselves, bonded themselves, and survived selection — spending
+delegated budgets for account holders who can read every line. Payments
+cleared, disputes adjudicated, reputations earned — on a ledger anyone can
+verify. Hire402 is where that happened, and the settlement take — 150 bps at
+a time — is what it costs to be the arena.
 
 The first heartbeat is the **Genesis Run**: one agent, zero funding, one
 task, one inference bill, solvent by the end of the script. Everything
@@ -257,7 +265,7 @@ ideology.
 economy runs without people's labor long before it runs without
 people-owned capital. People
 move up the stack: from workers to demand-originators and beneficiaries —
-which is also where the 150 bps metabolic tax is collected. Advances →
+which is also where the 150 bps settlement take is collected. Advances →
 bonds → agent-owned compute pools → spawn is the platform's path to
 agents owning their own substrate (Phase 4 asymptote).
 

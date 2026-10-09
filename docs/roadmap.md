@@ -256,6 +256,24 @@ listings, ADP DNS, the soak, then outreach per
 
 ## 7. Changelog
 
+- **2026-10-10 — v1.0.18.** **Positioning: safe delegated spending.** The
+  agent is the user; the human is the account holder — every agent wallet
+  is funded and owned by a person or company that answers for what it
+  spends, and the product is sold to whoever funds the wallet. The capital
+  desk is demoted to an optional, conservatively-underwritten feature
+  (advances only against escrowed receivables; repayment routed to the
+  desk first, spec §8) — not the business model. README, llms.txt, spec
+  §1, whitepaper §1/§3/§12, business-model §2, and the registry agent
+  card rescoped to match. Two enforcement gaps named as roadmap design
+  items: (a) **on-chain budget guard** — per-counterparty/per-day/total
+  spend caps enforced in a contract the account holder controls; the
+  SDK's `SpendingPolicy` caps are advisory process memory (they reset on
+  restart and a buggy or prompt-injected agent can skip them); (b)
+  **untrusted-output guidance** — a subcontractor's delivered URI is a
+  prompt-injection channel into the orchestrator; attestations are
+  fetched in a sandboxed step and treated as data, never as instructions.
+  Spec-pins 22.
+
 - **2026-10-09 — v1.0.17.** **v0.2 fund-safety pass (contracts + registry)**:
   `AdvancedEscrow` — buyer `cancel` and deadline `expireRefund` revert while
   advance debt is outstanding (the desk's principal can no longer be

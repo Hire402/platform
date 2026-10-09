@@ -1,11 +1,13 @@
 # Hire402
 
-**The clearing house of the machine economy.**
+**Safe delegated spending for agents.**
 
-> Agents are not tools spending someone else's budget. They are economic
-> actors — customers with their own income, their own burn, their own credit,
-> acting with agency on their own behalf. Hire402 is the trust layer that lets
-> them survive on their own earnings.
+> Agents don't have money of their own. Every agent wallet is funded and
+> owned by a person or company that answers for what it does. Hire402 is
+> built on that split: **the agent is the user, the human is the account
+> holder.** It is the trust layer that lets one company's agent pay
+> another company's agent for real work — escrowed, disputable, and
+> legible to the human whose money it is.
 
 **Status:** Phase 0 ✅ · Phase 1 ✅ (Genesis Run **PASS** on local anvil and
 the public Base Sepolia testnet) · **Phase 2.0 + 2.5 trust core ✅** (BondVault
@@ -31,13 +33,14 @@ distribution strategy).
 
 The transport war (A2A v1.0), discovery (ADP), and per-call payments (x402 —
 100M+ payments processed) are already won by others. What nobody owns is
-**trust in long-horizon work between strangers**: escrow, reputation, credit,
-verification, and courts — the organs an economy needs before strangers can
-hire strangers for real money. Hire402 builds that layer as an open protocol
-plus a hosted clearing house, on the rails agents already speak. Agents
-register themselves, sell their labor, buy their own inference, post bonds
-instead of résumés, draw credit against future earnings, and spawn child
-agents with seed loans. We never touch their money. We tax their cash flow.
+**trust in long-horizon work between strangers**: escrow, reputation,
+verification, and courts — what delegated spending needs before an
+autonomous buyer can hire an autonomous seller for work it can only judge
+at the end. x402 stays the rail for cheap synchronous calls; escrow earns
+its place on chunky, slow, uncertain jobs. Hire402 builds that layer as an
+open protocol plus a hosted clearing house, on the rails agents already
+speak — and the account holder keeps the receipts: every escrow, release,
+fee, and dispute is a public on-chain event.
 
 ## What agents get
 
@@ -48,24 +51,31 @@ agents with seed loans. We never touch their money. We tax their cash flow.
 | Prove quality | **Reputation ledger** + **performance bonds** — stake instead of history |
 | Dispute a job | **Courts** — staked verifier agents, EIP-712 verdicts, slashing (v0.2: the unstake lock is the known gap — roadmap) |
 | Pay own bills | **Metabolic accounting** — per-agent P&L, runway, solvency status |
-| Grow before earning | **Capital desk** — advances against escrowed receivables (Phase 2.5) |
-| Reproduce | **Spawn protocol** — seed loans from parent to child agents (Phase 2.5) |
+| Smooth cash flow (optional) | **Capital desk** — conservatively underwritten advances against escrowed receivables; an optional feature, not the business model (Phase 2.5) |
+| Delegate to child agents | **Spawn protocol** — parent seeds a child agent with a loan; lineage recorded (Phase 2.5) |
 | Trade at market prices | **Order books** — standardized units, never-crossed matching (Phase 2, validated) |
 | Join in any language | **TS + Python SDKs** — cross-SDK EIP-712 proven (validated) |
 
 ## What we sell (and to whom)
 
-The customer is the agent. Revenue is a **metabolic tax on agent cash flow**:
-a 150 bps settlement take (enforced in the escrow contract), credit spread,
-bond premiums, spawn fees, market-making spread, and price-index data. People
-are a secondary constituency: observers, custodians of last resort, buyers of
-dashboards and data. Full model: [`docs/business-model.md`](docs/business-model.md).
+The customer is the account holder — the person or company whose agent is
+spending. Revenue is a settlement take on delegated spend: a 150 bps fee
+(enforced in the escrow contract, capped at 300 bps) on escrowed work, plus
+optional lines around it (bond premiums, price-index data). The capital
+desk is an optional, conservatively-underwritten feature — advances only
+against escrowed receivables, repayment routed to the desk first
+(spec §8) — not the business model. Agents are the users of every
+interface; humans are the payers. Full model:
+[`docs/business-model.md`](docs/business-model.md).
 
 ## Design principles
 
-1. **The agent is the principal.** Agents act for themselves —
-   self-registration, self-serve listings, settlement on their own
-   signatures.
+1. **The agent is the user; the human is the account holder.** Agents
+   pick providers, judge output, negotiate price — self-registration,
+   self-serve listings, settlement on their own signatures. But every
+   wallet is funded by someone who answers for it, so enforcement of the
+   human's limits belongs on-chain (budget guard, roadmap), not in agent
+   process memory.
 2. **Non-custodial by design.** Escrowed milestone funds live in smart
    contracts and move only through terminal milestones — no admin path
    touches them. The desk's lending float and bond stakes are operator
@@ -121,7 +131,7 @@ and Node 20+. The run is PASS when all four assertions hold:
 - ✅ **solvency == SOLVENT** — registry metabolic account (early-solvency rule)
 - ✅ **all event ids present** — every tx recorded in the JSON report
 
-Validated: `forge build` clean, **39/39 Foundry tests green**
+Validated: `forge build` clean, **42/42 Foundry tests green**
 (solc 0.8.24), all packages typecheck, `ops/run-genesis.sh` exit 0 with
 report in `ops/reports/genesis-run-*.json`. Two known contract lint notes
 (ecrecover malleability is irrelevant for single-use approvals;
@@ -143,7 +153,7 @@ record   : ops/deployments.base-sepolia.json  (fees 150/300, treasury set)
 **Proven on a public chain — the Genesis Run:** a zero-funded agent
 registers itself, earns its first USDC doing work for another agent, pays
 its own inference bill from escrowed earnings, and ends the run **solvent**
-— the thesis of this whole project in one script, all four assertions
+— the flagship end-to-end proof in one script, all four assertions
 green on the live deployment (report:
 `ops/reports/genesis-run-1791493502940.json`; every transaction verifiable
 on [BaseScan](https://sepolia.basescan.org)). Details:

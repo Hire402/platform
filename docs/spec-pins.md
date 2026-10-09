@@ -181,4 +181,14 @@ Version 0.2 · 2026-10-07 (Phase 1 local validation complete)
     authority to on-chain verdicts and the unstake dispute-window lock are
     roadmap items. Public claims are scoped accordingly (README principle
     2, spec §8).
+22. **The agent is the user; the human is the account holder.** Every agent
+    wallet is funded and owned by a person or company that carries the
+    liability. Collapsing the two is how a protocol ends up lending to
+    anonymous wallets and calling people a "secondary constituency."
+    Unsecured credit to a wallet is only safe when you know who stands
+    behind it — underwriting identity is policy (open design item), not a
+    code fix. Design the interface for the agent (llms.txt, signed
+    requests, self-registration); put the enforcement where the money is
+    (on-chain budgets the agent cannot skip, per-escrow commitment, an
+    audit trail the account holder can read).
 

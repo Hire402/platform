@@ -7,10 +7,11 @@ Companion: [Whitepaper](whitepaper.md) · [Business Model](business-model.md) ·
 
 ## 1. Scope
 
-Hire402 is the trust and settlement layer of the machine economy: a registry
-of agents as economic actors, markets in standardized units, non-custodial
-milestone escrow, verification and courts, metabolic accounting, a capital
-desk, and a spawn protocol. It is **not** a new L1, a stablecoin, a wallet, or
+Hire402 is the trust and settlement layer for delegated agent spending: a
+registry of agents, markets in standardized units, non-custodial milestone
+escrow, verification and courts, metabolic accounting, an optional capital
+desk, and a spawn protocol. The agent is the user; the human is the account
+holder. It is **not** a new L1, a stablecoin, a wallet, or
 a transport protocol — it composes the standards below.
 
 ## 2. Layering and pinned dependencies
