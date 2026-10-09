@@ -310,9 +310,14 @@ the contract never holds desk funds); at each release the routing is:
 fee → treasury (unchanged), min(payout, principal + accrued interest) →
 desk, remainder → seller; simple per-second interest over a 365-day year;
 `repayAdvance` allows voluntary direct repayment (interest-first, capped
-at live debt). Refunds are never intercepted — the buyer's full refund
-right is untouched; a refunded milestone leaves the advance as the
-seller's outstanding debt (the desk priced that risk at signing). On
+at live debt). Buyer-side refund paths are gated while advance debt is live: `cancel`
+and `expireRefund` revert until the advance is repaid (a buyer who also
+runs the seller could otherwise refund in full after the desk has paid
+out, stranding the debt on a dead escrow). Arbiter `resolve()` refunds
+are not gated — that is a third-party judgment, priced by the desk's
+≤80% advance cap. The repayment sink is recorded per advance at
+acceptance (`setDesk` rotations cannot redirect live debt), and each
+offer signature is single-use (a second advance needs a fresh escrow). On
 advanced escrows `MilestoneReleased` reports the seller's ACTUAL receipt
 (post-routing) so metabolic accounting (§7) stays truthful.
 

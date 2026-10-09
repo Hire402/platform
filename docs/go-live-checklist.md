@@ -10,7 +10,7 @@ v1.0.7). Work top to bottom. Companion: [`ops-runbook.md`](ops-runbook.md)
 | Thing | Value |
 |---|---|
 | Hire402Escrow (Base Sepolia) | `0xde48e3788342c83c7d07749d377c00fa127d7aba` |
-| AdvancedEscrow | `0xa1a5ac67cc65821a376e8478d8625122df9c0be7` |
+| AdvancedEscrow (v0.2) | `0x9cc2377487fb3625d14bca395c2336da121b9a99` |
 | BondVault | `0xd659730547283f652648c392963d39c5d31e8c28` |
 | ReputationAnchor | `0xcf01ec128bd906c73e4b44bdc44728eaa7c33319` |
 | Testnet USDC (CDP) | `0x036CbD53842c5426634e7929541Ec2318f3dCF7e` |

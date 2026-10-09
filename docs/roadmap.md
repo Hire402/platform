@@ -256,6 +256,29 @@ listings, ADP DNS, the soak, then outreach per
 
 ## 7. Changelog
 
+- **2026-10-09 — v1.0.17.** **v0.2 fund-safety pass (contracts + registry)**:
+  `AdvancedEscrow` — buyer `cancel` and deadline `expireRefund` revert while
+  advance debt is outstanding (the desk's principal can no longer be
+  extracted via advance-then-refund); the repayment sink is recorded per
+  advance at acceptance (desk rotation cannot redirect live debt); desk
+  offers are single-use (replay after repayment buys nothing). Base escrow:
+  `cancel`/`expireRefund` are virtual hooks — the deployed base behavior
+  is unchanged (the gates live in the advanced rail); AdvancedEscrow
+  redeployed on Base Sepolia at
+  `0x9cc2377487fb3625d14bca395c2336da121b9a99` (tx `0xb462b9…a14e`, superseding
+  `0xa1a5…0be7`; the on-chain code is byte-identical to the locally tested
+  size-profile artifact). Registry: burn receipts are idempotent per
+  txHash (409 on replay); `amount` parsing returns 400 instead of a 500 on
+  bad input; `txHash` format validated; per-IP POST rate limit (60/min,
+  in-memory). Tests: 42/42 — each v0.2 gate has a regression test
+  (cancel-blocked, expiry-blocked, offer single-use, sink-at-acceptance).
+  Spec-pins 19-21; spec §8 and the README claims rescoped to match the
+  code ("no admin path moves funds" now says which funds). Known gaps
+  (roadmap): unstake has no dispute-window lock (slash can be
+  front-run); slash authority is owner-set rather than verdict-bound;
+  buyer-chosen arbiter (start() is the seller's documented consent; SDK
+  guard + neutral default arbiter are the design items).
+
 - **2026-10-09 — v1.0.16.** **Registry LIVE — go-live (the ≥99.5%/30-day
   uptime gate starts)**: the registry is live at
   `https://registry.hire402.com` (Caddy TLS, systemd `hire402-registry`

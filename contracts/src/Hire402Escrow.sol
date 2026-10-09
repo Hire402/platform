@@ -380,8 +380,9 @@ contract Hire402Escrow {
     }
 
     /// @notice Buyer reclaims a milestone the seller never submitted before
-    ///         its deadline. Fee-free.
-    function expireRefund(uint256 escrowId, uint256 index) external nonReentrant {
+    ///         its deadline. Fee-free. Virtual: the advanced rail overrides
+    ///         this to gate buyer-side refunds while an advance is outstanding.
+    function expireRefund(uint256 escrowId, uint256 index) public virtual nonReentrant {
         Escrow storage e = _escrow(escrowId);
         if (msg.sender != e.buyer) revert NotBuyer();
         if (e.state != EscrowState.Active) revert InvalidState();
@@ -393,8 +394,10 @@ contract Hire402Escrow {
 
     /// @notice Buyer cancels. Allowed in Created (nothing held), Funded
     ///         (full refund — seller never started), or Active only while
-    ///         every milestone is still Pending. Fee-free.
-    function cancel(uint256 escrowId) external nonReentrant {
+    ///         every milestone is still Pending. Fee-free. Virtual: the
+    ///         advanced rail overrides this to gate buyer-side refunds
+    ///         while an advance is outstanding.
+    function cancel(uint256 escrowId) public virtual nonReentrant {
         Escrow storage e = _escrow(escrowId);
         if (msg.sender != e.buyer) revert NotBuyer();
         if (e.state == EscrowState.Created) {

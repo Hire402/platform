@@ -18,12 +18,14 @@ interface TestVm {
 /// @title AdvancedEscrowTest — spec §8 Advances acceptance tests (self-contained).
 /// @notice Covers: EIP-712 offer acceptance (desk→seller disbursement, APR
 ///         bounds 500–800, 80% cap incl. exact boundary, desk-only signer,
-///         expiry, seller-only, Active-only, no duplicates); release routing
-///         (full repayment with exact 365-day interest, partial routing with
-///         a second accrual period, interest-first application); voluntary
-///         direct repayment (capped at live debt, no overpayment); refunds
-///         NOT intercepted (debt survives); re-advance after clearance;
-///         fee untouched by the rail (still 150 bps).
+///         expiry, seller-only, Active-only, single use per offer); release
+///         routing (full repayment with exact 365-day interest, partial
+///         routing with a second accrual period, interest-first application);
+///         voluntary direct repayment (capped at live debt, no overpayment,
+///         paid to the desk recorded at acceptance); buyer-side refunds
+///         BLOCKED while debt is outstanding (cancel + deadline expiry;
+///         arbiter resolve() stays); one advance per escrow; fee untouched
+///         by the rail (still 150 bps).
 contract AdvancedEscrowTest {
     TestVm constant vm = TestVm(0x7109709ECfa91a80626fF3989D68f67F5b1DD12D);
 
@@ -342,7 +344,7 @@ contract AdvancedEscrowTest {
         _assertEq(escrow.advanceDebt(id), 800_000, "debt survives refund");
     }
 
-    function test_ReAdvanceAfterCleared() public {
+    function test_AcceptAdvance_OfferSingleUse() public {
         uint256 id = _activeEscrow();
         _submitBoth(id);
         _accept(id, 800_000, 600);
@@ -352,8 +354,14 @@ contract AdvancedEscrowTest {
 
         _assertEq(escrow.advanceDebt(id), 0, "debt cleared");
 
-        _accept(id, 500_000, 500); // fresh offer against the remaining receivable
-        _assertEq(escrow.advanceDebt(id), 500_000, "re-advance accepted");
+        // A fresh desk signature for the same escrow is refused: one offer,
+        // one consumption — repay-then-replay buys nothing. (Signature first:
+        // the digest staticcall would otherwise consume the expectRevert.)
+        uint64 expiry = uint64(block.timestamp + 1 hours);
+        (uint8 v, bytes32 r, bytes32 s) = _offer(id, 500_000, 500, expiry);
+        vm.expectRevert(AdvancedEscrow.OfferUsed.selector);
+        vm.prank(seller);
+        escrow.acceptAdvance(id, 500_000, 500, expiry, v, r, s);
     }
 
     function test_FeeUnchangedByRail() public {
@@ -370,6 +378,61 @@ contract AdvancedEscrowTest {
         (, uint256 released, , uint256 feesPaid, ) = escrow.getEscrowTotals(id);
         _assertEq(released, 1_000_000, "gross released accounting unchanged");
         _assertEq(feesPaid, FEE, "feesPaid accounting unchanged");
+    }
+
+    // ------------------------------------------------------------------
+    // v0.2 fund-safety gates: buyer refunds vs live advances, sink-at-
+    // acceptance. (Each test below is a regression: it reverts on the
+    // pre-v0.2 contract.)
+    // ------------------------------------------------------------------
+
+    function test_Cancel_BlockedWhileAdvanceOutstanding() public {
+        uint256 id = _activeEscrow();
+        uint256 buyerBal = usdc.balanceOf(buyer);
+        uint256 deskBal = usdc.balanceOf(desk); // BEFORE the advance payout
+        _accept(id, 800_000, 600);
+
+        // The drain shape: buyer cancels after the desk has paid out.
+        vm.prank(buyer);
+        vm.expectRevert(AdvancedEscrow.AdvanceOutstanding.selector);
+        escrow.cancel(id);
+
+        // Debt repaid → the gate opens; the desk is made whole first.
+        vm.prank(seller);
+        escrow.repayAdvance(id, 800_000); // no warp → interest 0
+        vm.prank(buyer);
+        escrow.cancel(id);
+
+        _assertEq(usdc.balanceOf(buyer) - buyerBal, 2_000_000, "buyer refunded in full");
+        _assertEq(usdc.balanceOf(desk) - deskBal, 0, "desk made whole");
+        _assertEq(escrow.advanceDebt(id), 0, "no stranded debt");
+    }
+
+    function test_ExpireRefund_BlockedWhileAdvanceOutstanding() public {
+        uint256 id = _activeEscrow();
+        _accept(id, 800_000, 600);
+        vm.warp(block.timestamp + 61 days); // past milestone 0's 30-day deadline
+
+        vm.prank(buyer);
+        vm.expectRevert(AdvancedEscrow.AdvanceOutstanding.selector);
+        escrow.expireRefund(id, 0);
+    }
+
+    function test_Repay_GoesToDeskRecordedAtAcceptance() public {
+        uint256 id = _activeEscrow();
+        _accept(id, 800_000, 600);
+
+        // The owner rotates the desk mid-loan.
+        escrow.setDesk(address(0xBEEF));
+
+        uint256 oldDeskBal = usdc.balanceOf(desk);
+        uint256 newDeskBal = usdc.balanceOf(address(0xBEEF));
+
+        vm.prank(seller);
+        escrow.repayAdvance(id, 800_000);
+
+        _assertEq(usdc.balanceOf(desk) - oldDeskBal, 800_000, "repaid to the desk recorded at acceptance");
+        _assertEq(usdc.balanceOf(address(0xBEEF)) - newDeskBal, 0, "new desk gets nothing");
     }
 }
 

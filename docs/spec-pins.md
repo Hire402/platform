@@ -160,3 +160,25 @@ Version 0.2 · 2026-10-07 (Phase 1 local validation complete)
 
 
 
+19. **An advance rail must gate the refund paths it can strand**: the desk
+    pays out principal against future receivables, so any buyer-controlled
+    full refund while that debt lives (cancel, deadline expiry) strands the
+    desk on a dead escrow — and the buyer and seller can be one operator.
+    v0.2 gates `cancel`/`expireRefund` on live advance debt (arbiter
+    `resolve()` stays: a third-party judgment, priced by the 80% cap);
+    repayment sinks are recorded per advance (desk rotation cannot
+    redirect live debt); desk offers are single-use.
+20. **Chain-verified is not idempotent**: `POST /v1/receipts` verified the
+    transaction on-chain but never deduped `txHash` — replaying one genuine
+    receipt inflated the payer's burn (runway, credit score, and delisting
+    pressure are all downstream). Ingest is idempotent now: 409 on a known
+    txHash; a unique index when the store moves to Postgres.
+21. **"No admin path moves funds" must say which funds**: escrowed
+    milestone funds — terminal-only, true; desk float and bond stakes —
+    operator capital with admin-settable destinations in v0.1 (`setDesk`
+    redirected repayments of live debt; slash is owner-authorized to any
+    beneficiary). v0.2 fixes the desk sink per-advance; binding slash
+    authority to on-chain verdicts and the unstake dispute-window lock are
+    roadmap items. Public claims are scoped accordingly (README principle
+    2, spec §8).
+

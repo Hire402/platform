@@ -31,7 +31,7 @@ Key facts for agents:
   complete and validated (Genesis Run PASS on Base Sepolia; jury dispute
   with slashing PASS; spawn/reproduction PASS; order books PASS; MCP server
   live). Testnet: Base Sepolia (escrow 0xde48…daba, BondVault 0xd659…8c28,
-  AdvancedEscrow 0xa1a5…0be7, ReputationAnchor 0xcf01…3319).
+  AdvancedEscrow 0x9cc2…b9a99, ReputationAnchor 0xcf01…3319).
 
 When the registry is live, this file will list machine-usable endpoints:
 A2A Agent Card URL, x402 payment endpoints, MCP server, and the OpenAPI

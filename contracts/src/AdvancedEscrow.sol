@@ -38,6 +38,8 @@ contract AdvancedEscrow is Hire402Escrow {
     error AdvanceCapExceeded();
     error AdvanceExists();
     error NoAdvance();
+    error OfferUsed();           // an offer signature is consumable once
+    error AdvanceOutstanding();  // buyer-side refunds blocked while debt lives
 
     // -----------------------------------------------------------------
     // Constants (spec §8)
@@ -63,6 +65,8 @@ contract AdvancedEscrow is Hire402Escrow {
         uint64  lastAccrual;       // timestamp of last interest accrual
         uint256 accruedInterest;   // interest accrued, unpaid
         uint256 totalRepaid;       // lifetime principal + interest repaid
+        address desk;             // repayment sink — recorded at acceptance
+        bool    offerUsed;         // one offer signature, one consumption
     }
 
     // -----------------------------------------------------------------
@@ -100,6 +104,9 @@ contract AdvancedEscrow is Hire402Escrow {
         desk = desk_;
     }
 
+    /// @notice Replaces the desk. Affects NEW advances only — every advance
+    ///         records its repayment sink at acceptance (Advance.desk), so
+    ///         a rotation can never redirect repayments of live debt.
     function setDesk(address newDesk) external onlyOwner {
         if (newDesk == address(0)) revert InvalidAddress();
         emit DeskUpdated(desk, newDesk);
@@ -112,7 +119,9 @@ contract AdvancedEscrow is Hire402Escrow {
 
     /// @notice Seller accepts the desk's signed offer. Principal flows
     ///         desk → seller immediately; repayment is auto-routed at every
-    ///         subsequent milestone release.
+    ///         subsequent milestone release. One advance per escrow: the
+    ///         offer signature is consumed at acceptance (a second borrowing
+    ///         needs a fresh escrow).
     function acceptAdvance(
         uint256 escrowId,
         uint256 principal,
@@ -135,11 +144,14 @@ contract AdvancedEscrow is Hire402Escrow {
 
         Advance storage a = _advances[escrowId];
         if (a.principal != 0 || a.accruedInterest != 0) revert AdvanceExists();
+        if (a.offerUsed) revert OfferUsed();
         if (principal > (remainingReceivables(escrowId) * ADVANCE_BPS) / 10_000) revert AdvanceCapExceeded();
 
         a.principal = principal;
         a.aprBps = aprBps;
         a.lastAccrual = uint64(block.timestamp);
+        a.desk = desk;      // repayment sink frozen at acceptance
+        a.offerUsed = true; // the offer signature is consumed for good
 
         _safeTransferFrom(IERC20(e.token), desk, e.seller, principal);
         emit AdvanceAccepted(escrowId, e.seller, principal, aprBps);
@@ -147,6 +159,7 @@ contract AdvancedEscrow is Hire402Escrow {
 
     /// @notice Voluntary direct repayment (anyone may pay on the seller's
     ///         behalf). Interest first; no overpayment beyond live debt.
+    ///         Paid to the desk recorded at acceptance.
     function repayAdvance(uint256 escrowId, uint256 amount) external nonReentrant {
         Escrow storage e = _escrow(escrowId);
         Advance storage a = _advances[escrowId];
@@ -160,8 +173,33 @@ contract AdvancedEscrow is Hire402Escrow {
         a.accruedInterest -= interestPart;
         a.principal -= principalPart;
         a.totalRepaid += pay;
-        _safeTransferFrom(IERC20(e.token), msg.sender, desk, pay);
+        _safeTransferFrom(IERC20(e.token), msg.sender, a.desk, pay);
         emit AdvanceRepaid(escrowId, msg.sender, pay, interestPart, principalPart, a.principal);
+    }
+
+    // -----------------------------------------------------------------
+    // Buyer-side refund gates: the desk's principal must leave through
+    // repayment, never through a buyer-controlled refund path (spec §8).
+    // (No re-entrancy modifier here by design: the guard lives in the base
+    // implementations, and re-applying it would double-lock the shared
+    // storage flag. The checks below are pure views.)
+    // -----------------------------------------------------------------
+
+    /// @notice Cancel is blocked while an advance is outstanding — a
+    ///         buyer who also controls the seller could otherwise take an
+    ///         advance, cancel, and refund in full, stranding the desk's
+    ///         debt on a Cancelled escrow. Arbiter `resolve()` refunds are
+    ///         not gated: that is a third-party judgment, priced by the
+    ///         desk's 80% cap.
+    function cancel(uint256 escrowId) public override {
+        if (advanceDebt(escrowId) != 0) revert AdvanceOutstanding();
+        super.cancel(escrowId);
+    }
+
+    /// @notice Same gate on deadline-expiry refunds.
+    function expireRefund(uint256 escrowId, uint256 index) public override {
+        if (advanceDebt(escrowId) != 0) revert AdvanceOutstanding();
+        super.expireRefund(escrowId, index);
     }
 
     // -----------------------------------------------------------------
@@ -187,7 +225,7 @@ contract AdvancedEscrow is Hire402Escrow {
             a.accruedInterest -= interestPart;
             a.principal -= principalPart;
             a.totalRepaid += toDesk;
-            _safeTransfer(IERC20(e.token), desk, toDesk);
+            _safeTransfer(IERC20(e.token), a.desk, toDesk);
             sellerNet = payout - toDesk;
             emit AdvanceRepaidFromRelease(escrowId, index, toDesk, interestPart, principalPart, a.principal);
         }

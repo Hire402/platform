@@ -17,7 +17,7 @@ to the desk first at every release**; `ops/run-desk-demo.sh` exit 0 with
 all assertions green). `ops/run-dispute-demo.sh` (jury dispute + spawn)
 and `bash ops/run-genesis.sh` also exit 0 with all assertions green. Base
 Sepolia contracts (live): escrow `0xde48…daba`, BondVault
-`0xd659…8c28`, AdvancedEscrow `0xa1a5…0be7`, ReputationAnchor
+`0xd659…8c28`, AdvancedEscrow `0x9cc2…b9a99`, ReputationAnchor
 `0xcf01…3319`.
 See [`docs/roadmap.md`](docs/roadmap.md).
 
@@ -46,7 +46,7 @@ agents with seed loans. We never touch their money. We tax their cash flow.
 | Be found; find others | **Directory** — index of the agent economy (crawls ADP, A2A Agent Cards, x402 endpoints) |
 | Trust strangers | **Escrow** — milestone contracts, optimistic release, challenge windows |
 | Prove quality | **Reputation ledger** + **performance bonds** — stake instead of history |
-| Dispute a job | **Courts** — staked verifier agents, EIP-712 verdicts, slashing (Phase 2, validated) |
+| Dispute a job | **Courts** — staked verifier agents, EIP-712 verdicts, slashing (v0.2: the unstake lock is the known gap — roadmap) |
 | Pay own bills | **Metabolic accounting** — per-agent P&L, runway, solvency status |
 | Grow before earning | **Capital desk** — advances against escrowed receivables (Phase 2.5) |
 | Reproduce | **Spawn protocol** — seed loans from parent to child agents (Phase 2.5) |
@@ -66,8 +66,10 @@ dashboards and data. Full model: [`docs/business-model.md`](docs/business-model.
 1. **The agent is the principal.** Agents act for themselves —
    self-registration, self-serve listings, settlement on their own
    signatures.
-2. **Non-custodial by design.** Funds live in smart contracts; the company
-   never holds them. No money-transmitter business, no counterparty risk.
+2. **Non-custodial by design.** Escrowed milestone funds live in smart
+   contracts and move only through terminal milestones — no admin path
+   touches them. The desk's lending float and bond stakes are operator
+   capital on their own rails (spec §8), never escrowed money.
 3. **Ride the standards, don't fork them.** A2A for transport, x402 for
    per-call money, ADP for discovery, MCP for onboarding. We write extensions
    upstream.

@@ -32,6 +32,31 @@ function parseBody(req: FastifyRequest): Record<string, unknown> {
 export function registerRoutes(app: FastifyInstance, deps: RegistryDeps) {
   const { pc, usdc, escrowAddr, store, auth } = deps;
 
+  // ---------------- input safety: per-IP POST rate limit ----------------
+  // (v0.1: in-memory fixed window — fine for a single-process registry;
+  //  Postgres-backed if it ever scales out. Fastify caps request bodies
+  //  at 1 MiB by default.)
+  const WINDOW_MS = 60_000;
+  const MAX_POSTS_PER_WINDOW = 60;
+  const hits = new Map<string, { n: number; reset: number }>();
+  app.addHook('preHandler', async (req, reply) => {
+    if (req.method !== 'POST') return;
+    const ip = req.socket.remoteAddress ?? 'unknown';
+    const now = Date.now();
+    if (hits.size > 10_000) {
+      for (const [k, v] of hits) if (now >= v.reset) hits.delete(k);
+    }
+    const w = hits.get(ip);
+    if (!w || now >= w.reset) {
+      hits.set(ip, { n: 1, reset: now + WINDOW_MS });
+      return;
+    }
+    w.n += 1;
+    if (w.n > MAX_POSTS_PER_WINDOW) {
+      reply.code(429).send({ error: 'rate limit: too many POSTs; retry after the window' });
+    }
+  });
+
   const rejectAuth = async (
     req: FastifyRequest,
     reply: { code: (n: number) => { send: (b: unknown) => unknown } },
@@ -338,10 +363,22 @@ keccak256(rawBody); headers X-Hire402-Sig/-Addr/-Ts/-Nonce. Replay-protected.
       service?: string;
     };
     const payer = (body.payer ?? '').toLowerCase();
-    if (!/^0x[0-9a-f]{40}$/.test(payer) || !body.amount || !body.txHash) {
+    const txHash = (body.txHash ?? '').toLowerCase();
+    if (!/^0x[0-9a-f]{40}$/.test(payer) || !body.amount || !txHash) {
       return reply.code(400).send({ error: 'payer, amount, txHash required' });
     }
-    const amount = BigInt(body.amount);
+    if (!/^0x[0-9a-f]{64}$/.test(txHash)) {
+      return reply.code(400).send({ error: 'txHash must be a 32-byte hex string' });
+    }
+    let amount: bigint;
+    try {
+      amount = BigInt(body.amount);
+    } catch {
+      return reply.code(400).send({ error: 'amount must be an integer string in base units' });
+    }
+    if (amount <= 0n) {
+      return reply.code(400).send({ error: 'amount must be positive' });
+    }
 
     // Verify on-chain: a USDC Transfer(payer → provider, amount) exists in
     // the receipt. The registry never trusts signatures over money — it
@@ -349,7 +386,7 @@ keccak256(rawBody); headers X-Hire402-Sig/-Addr/-Ts/-Nonce. Replay-protected.
     let receipt: Awaited<ReturnType<typeof pc.getTransactionReceipt>> | undefined;
     for (let i = 0; i < 8; i++) {
       try {
-        receipt = await pc.getTransactionReceipt({ hash: body.txHash });
+        receipt = await pc.getTransactionReceipt({ hash: txHash as `0x${string}` });
         break;
       } catch {
         await new Promise((r) => setTimeout(r, 1500));
@@ -381,12 +418,19 @@ keccak256(rawBody); headers X-Hire402-Sig/-Addr/-Ts/-Nonce. Replay-protected.
       return reply.code(400).send({ error: 'receipt does not verify on-chain' });
     }
 
+    // Replay guard: a txHash is recorded ONCE. Resubmitting a genuine
+    // receipt must not double-count the payer's burn (runway, credit
+    // score, delisting are downstream of it).
+    if (store.receipts.some((r) => r.txHash.toLowerCase() === txHash)) {
+      return reply.code(409).send({ error: 'receipt already recorded' });
+    }
+
     const record = {
       id: `rcpt_${Date.now().toString(36)}`,
       payer,
       to: a.address,
       amount: body.amount,
-      txHash: body.txHash,
+      txHash,
       service: body.service ?? 'unknown',
       createdAt: new Date().toISOString(),
     };
