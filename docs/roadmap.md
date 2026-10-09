@@ -256,6 +256,19 @@ listings, ADP DNS, the soak, then outreach per
 
 ## 7. Changelog
 
+- **2026-10-09 — v1.0.16.** **Registry LIVE — go-live (the ≥99.5%/30-day
+  uptime gate starts)**: the registry is live at
+  `https://registry.hire402.com` (Caddy TLS, systemd `hire402-registry`
+  running as the `hire402` user, `Restart=always`, JSON store). Base
+  Sepolia via a provider RPC; escrow/USDC/anchor pins from
+  `ops/deployments.base-sepolia.json`. Anchoring live: epoch 1 anchored
+  by the boot smoke test, epoch 2 by the service — the gapless on-chain
+  sequence held through the restart. `/v1/anchor` serves the on-chain
+  root; `/v1/anchor/proof/{address}` the proofs; agent card + OpenAPI
+  schema served at the usual well-known paths. Apex holding page live at
+  hire402.com. Remaining: external uptime monitor; then the soak
+  (go-live checklist Step 7).
+
 - **2026-10-09 — v1.0.15.** **Public-history squash**: the public repo's
   history is a single initial commit (the release point); this changelog
   is the development record. Pre-release codename references removed

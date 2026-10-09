@@ -84,7 +84,14 @@ included; see the v1.0.11 changelog.)
 3. **Verify** (fresh venv): `pip install hire402` then
    `python -c "import hire402; print(hire402.AdvanceClient)"`.
 
-## Step 3 — 45 min: host the registry (STARTS THE 30-DAY UPTIME CLOCK)
+## Step 3 ✅ — DONE 2026-10-09: registry LIVE at https://registry.hire402.com
+
+The registry went live 2026-10-09: systemd `hire402-registry` (running as the
+`hire402` user, `Restart=always`), Caddy TLS, `healthz` green, anchor epochs
+flowing — epoch 1 was anchored by the boot smoke test and epoch 2 by the
+service, so the gapless on-chain sequence held through the restart on day
+one. **The ≥99.5%/30-day uptime gate runs from 2026-10-09.**
+Remaining from this step: the external uptime monitor (3f).
 
 ### 3a. Provider RPC (public RPCs will rate-limit the indexer)
 
