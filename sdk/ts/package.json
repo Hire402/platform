@@ -1,0 +1,40 @@
+{
+  "name": "@hire402/sdk",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Hire402 SDK — the trust and settlement layer for the machine economy: milestone escrow, staked verifier courts, bonds, capital desk, metabolic accounting (TS).",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Hire402/platform.git",
+    "directory": "sdk/ts"
+  },
+  "keywords": [
+    "ai-agents", "agent-economy", "escrow", "x402", "a2a", "usdc",
+    "base", "machine-economy", "settlement", "trust-layer"
+  ],
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm run build",
+    "deploy:dev": "tsx scripts/deploy-dev.ts"
+  },
+  "dependencies": {
+    "viem": "^2.21.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

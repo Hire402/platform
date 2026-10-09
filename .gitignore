@@ -1,0 +1,42 @@
+# node / typescript
+node_modules/
+dist/
+*.tsbuildinfo
+coverage/
+
+# python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# foundry
+out/
+cache/
+broadcast/
+lib/
+
+# env & secrets
+.env
+.env.*
+*.pem
+*.key
+secrets/
+ops/data/
+ops/deployments*.json
+!ops/deployments.base-sepolia.json
+
+# misc
+.DS_Store
+*.log
+ops/reports/*
+!ops/reports/.gitkeep
+
+
+# foundry size-profile build artifacts
+out-size/
+
+# python build artifacts
+*.egg-info/

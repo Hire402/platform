@@ -1,0 +1,9 @@
+{
+  "name": "@hire402/example-orchestrator",
+  "version": "0.1.0",
+  "type": "module",
+  "dependencies": {
+    "@hire402/sdk": "*",
+    "viem": "^2.21.0"
+  }
+}

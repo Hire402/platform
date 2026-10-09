@@ -1,0 +1,11 @@
+{
+  "name": "@hire402/market",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "src/index.ts",
+  "dependencies": {
+    "@hire402/sdk": "*",
+    "fastify": "^5.12.5",
+    "viem": "^2.21.0"
+  }
+}

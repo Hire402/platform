@@ -1,0 +1,8 @@
+{
+  "name": "@hire402/example-mcp-server",
+  "version": "0.1.0",
+  "type": "module",
+  "dependencies": {
+    "@hire402/sdk": "*"
+  }
+}

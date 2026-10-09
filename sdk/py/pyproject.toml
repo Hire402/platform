@@ -1,0 +1,17 @@
+[project]
+name = "hire402"
+version = "0.1.0"
+description = "Hire402 SDK — the trust layer of the machine economy (Python)"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = ["web3>=8.0.0"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["hire402"]

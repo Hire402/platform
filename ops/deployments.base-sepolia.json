@@ -1,0 +1,29 @@
+{
+  "chainId": 84532,
+  "chain": "base-sepolia",
+  "rpc": "https://sepolia.base.org",
+  "escrow": "0xde48e3788342c83c7d07749d377c00fa127d7aba",
+  "deployTx": "0x60c7a59d0d4dc5c656fbc7a3773ef81097eb8abfab746cc510b9ffa1dff15cc5",
+  "treasury": "0xCFdeA0E705A5224aEa97a7f59Bd106CA94DcEa4e",
+  "arbiter": "0xCFdeA0E705A5224aEa97a7f59Bd106CA94DcEa4e",
+  "deployer": "0xCFdeA0E705A5224aEa97a7f59Bd106CA94DcEa4e",
+  "feeConfig": {
+    "minFeeBps": 150,
+    "maxFeeBps": 300
+  },
+  "generatedAt": "2026-10-08T19:57:04Z",
+  "bond": "0xd659730547283f652648c392963d39c5d31e8c28",
+  "bondToken": "0x036CbD53842c5426634e7929541Ec2318f3dCF7e",
+  "bondDeployTx": "0x85546ff9da9f9acf79d737c12a212979d866cb6a23784297f03d59e22741c5ac",
+  "advancedEscrow": "0xa1a5ac67cc65821a376e8478d8625122df9c0be7",
+  "advancedDeployTx": "0x9fd235099d5a2154180e47b01f087d464c2596def7bb334edda3c1d7c390ab32",
+  "desk": "0x3F63fFb14351d0c113232805F398CB2eFE747022",
+  "deskNote": "dedicated ops key (ops/data/base-sepolia-ops.json, gitignored); signs EIP-712 AdvanceOffers; USDC float goes here",
+  "reputationAnchor": "0xcf01ec128bd906c73e4b44bdc44728eaa7c33319",
+  "anchorDeployTx": "0x4a6a9e650fdbcab07b3ee307da92902ca7761588c29332c307bd0c7ec5b23056",
+  "anchorNote": "anchorer = dedicated ops key (ops/data/base-sepolia-ops.json); registry operator rotates via setAnchorer; epochs are consecutive sequence numbers anchored on a 6h cadence",
+  "anchorer": "0x7956A544647D4f8A57BE0ec51aA1E5d99cD3C7E0",
+  "anchorerNote": "dedicated ops key; sends anchor() every 6h (ANCHOR_EPOCH_SECONDS); keep >= 0.001 ETH",
+  "opsKeyRotation": "2026-10-08T14:04:05.058Z",
+  "notes": "DEPLOYMENT 2026-10-08: all four contracts deployed under the final names; on-chain EIP-712 NAMEs match the SDKs ('Hire402Escrow', 'Hire402AdvancedEscrow', 'Hire402Court' bond rail). Deployer funded via PoW faucet; treasury/arbiter = deployer (testnet); fee config 150/300 bps verified post-deploy. BondVault bond asset = canonical CDP testnet USDC, verifier pool = deployer (testnet). Desk and anchorer are the dedicated ops keys from ops/data/base-sepolia-ops.json (gitignored) — constructor-set on these contracts, no on-chain rotation call needed. Initial 2026-10-07 deployments retired and superseded: escrow 0xdc178860873376e99af6aaf1367087f83c83d46d, bond 0xe5aeb7263bafebd710d800b413051702a46a73cf, advanced 0x363829d0b6a25bb73fea27dd1d4a420381ac14a8, anchor 0xe75380c9790ea47549a436048d4bf91f8c31d214."
+}

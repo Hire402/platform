@@ -1,0 +1,124 @@
+name: ci
+on: [push, pull_request]
+
+jobs:
+  contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: foundry-rs/foundry-toolchain@v1
+      - run: forge test --root contracts
+
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm install --no-audit --no-fund
+      - run: npm run typecheck
+
+  genesis-run:
+    runs-on: ubuntu-latest
+    needs: [contracts, typecheck]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: foundry-rs/foundry-toolchain@v1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: bash ops/run-genesis.sh
+
+  dispute-demo:
+    runs-on: ubuntu-latest
+    needs: [contracts, typecheck]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: foundry-rs/foundry-toolchain@v1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: bash ops/run-dispute-demo.sh
+
+  desk-demo:
+    runs-on: ubuntu-latest
+    needs: [contracts, typecheck]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: foundry-rs/foundry-toolchain@v1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: bash ops/run-desk-demo.sh
+
+  bond-decay-demo:
+    runs-on: ubuntu-latest
+    needs: [contracts, typecheck]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: foundry-rs/foundry-toolchain@v1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: bash ops/run-bond-decay-demo.sh
+
+  anchor-demo:
+    runs-on: ubuntu-latest
+    needs: [contracts, typecheck]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: foundry-rs/foundry-toolchain@v1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: bash ops/run-anchor-demo.sh
+
+  credit-demo:
+    runs-on: ubuntu-latest
+    needs: [contracts, typecheck]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: foundry-rs/foundry-toolchain@v1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: bash ops/run-credit-demo.sh
+
+  external-wallet-demo:
+    runs-on: ubuntu-latest
+    needs: [contracts, typecheck]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: foundry-rs/foundry-toolchain@v1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: bash ops/run-external-wallet-demo.sh
+
+  restart-drill:
+    runs-on: ubuntu-latest
+    needs: [contracts, typecheck]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: foundry-rs/foundry-toolchain@v1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: bash ops/run-restart-drill.sh
+
+  python-sdk:
+    runs-on: ubuntu-latest
+    needs: [contracts, typecheck]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: foundry-rs/foundry-toolchain@v1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: bash ops/run-py-genesis.sh
+
+

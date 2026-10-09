@@ -1,0 +1,29 @@
+{
+  "name": "hire402",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "sdk/ts",
+    "registry",
+    "market",
+    "examples/researcher-agent",
+    "examples/inference-provider",
+    "examples/orchestrator",
+    "examples/court",
+    "examples/verifier-agent",
+    "examples/coder-agent",
+    "examples/mcp-server"
+  ],
+  "scripts": {
+    "typecheck": "tsc -p sdk/ts/tsconfig.build.json && tsc -p registry --noEmit && tsc -p market --noEmit && tsc -p examples/researcher-agent --noEmit && tsc -p examples/inference-provider --noEmit && tsc -p examples/orchestrator --noEmit && tsc -p examples/court --noEmit && tsc -p examples/verifier-agent --noEmit && tsc -p examples/coder-agent --noEmit && tsc -p examples/mcp-server --noEmit",
+    "genesis:run": "bash ops/run-genesis.sh",
+    "genesis:testnet": "bash ops/run-genesis-testnet.sh",
+    "dispute:demo": "bash ops/run-dispute-demo.sh"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.5.4"
+  }
+}
+
