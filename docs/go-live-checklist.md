@@ -13,6 +13,7 @@ v1.0.7). Work top to bottom. Companion: [`ops-runbook.md`](ops-runbook.md)
 | AdvancedEscrow (v0.2) | `0x9cc2377487fb3625d14bca395c2336da121b9a99` |
 | BondVault | `0xd659730547283f652648c392963d39c5d31e8c28` |
 | ReputationAnchor | `0xcf01ec128bd906c73e4b44bdc44728eaa7c33319` |
+| BudgetGuard (v0.3) | `0x0687fecde32b0ba4d21fd96283df12a699b255ea` |
 | Testnet USDC (CDP) | `0x036CbD53842c5426634e7929541Ec2318f3dCF7e` |
 | Buyer wallet (faucet target) | `0x0E2AcEbC290a9651d55F4A8FfaB9fA48d7427DAD` |
 | Ops keys (desk + anchorer) | `ops/data/base-sepolia-ops.json` — **gitignored; back this file up** |

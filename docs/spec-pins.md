@@ -191,4 +191,13 @@ Version 0.2 · 2026-10-07 (Phase 1 local validation complete)
     requests, self-registration); put the enforcement where the money is
     (on-chain budgets the agent cannot skip, per-escrow commitment, an
     audit trail the account holder can read).
+23. **Advisory caps are not enforcement.** SDK-side spending policies
+    live in process memory: they reset on restart and a buggy or
+    prompt-injected agent can simply skip them. If a limit matters —
+    per-counterparty, per-day, total — it must be enforced where the
+    money is: a contract the account holder funds and controls
+    (`BudgetGuard`), not code the agent runs. Two semantics pinned
+    there: the day is the CHAIN day (`block.timestamp / 1 days`), not
+    the agent's local timezone; and cap accounting is CONSERVATIVE — a
+    refunded escrow returns funds but never cap room.
 

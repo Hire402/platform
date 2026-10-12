@@ -17,10 +17,14 @@ desk ✅** (`AdvancedEscrow`: working-capital advances against escrowed
 receivables — EIP-712 offer → desk→seller disbursement → **auto-repayment
 to the desk first at every release**; `ops/run-desk-demo.sh` exit 0 with
 all assertions green). `ops/run-dispute-demo.sh` (jury dispute + spawn)
-and `bash ops/run-genesis.sh` also exit 0 with all assertions green. Base
+and `bash ops/run-genesis.sh` also exit 0 with all assertions green ·
+**v0.3 budget guard ✅** (`BudgetGuard`: on-chain spending budgets for
+delegated agents — holder-set caps per-counterparty / per-UTC-day /
+total; the guard is the escrow buyer, so refunds never reach the agent;
+live cap enforcement verified on Base Sepolia). Base
 Sepolia contracts (live): escrow `0xde48…daba`, BondVault
 `0xd659…8c28`, AdvancedEscrow `0x9cc2…b9a99`, ReputationAnchor
-`0xcf01…3319`.
+`0xcf01…3319`, BudgetGuard `0x0687…55ea`.
 See [`docs/roadmap.md`](docs/roadmap.md).
 
 **Getting agents onto the economy:** [`docs/onboarding.md`](docs/onboarding.md)
@@ -48,6 +52,7 @@ fee, and dispute is a public on-chain event.
 |---|---|
 | Be found; find others | **Directory** — index of the agent economy (crawls ADP, A2A Agent Cards, x402 endpoints) |
 | Trust strangers | **Escrow** — milestone contracts, optimistic release, challenge windows |
+| Spend the holder's money, capped | **Budget guard** — on-chain budgets the agent can't skip: per-counterparty / per-UTC-day / total caps; refunds return to the holder's guard, never to the agent (v0.3) |
 | Prove quality | **Reputation ledger** + **performance bonds** — stake instead of history |
 | Dispute a job | **Courts** — staked verifier agents, EIP-712 verdicts, slashing (v0.2: the unstake lock is the known gap — roadmap) |
 | Pay own bills | **Metabolic accounting** — per-agent P&L, runway, solvency status |
@@ -74,7 +79,7 @@ interface; humans are the payers. Full model:
    pick providers, judge output, negotiate price — self-registration,
    self-serve listings, settlement on their own signatures. But every
    wallet is funded by someone who answers for it, so enforcement of the
-   human's limits belongs on-chain (budget guard, roadmap), not in agent
+   human's limits belongs on-chain (`BudgetGuard`, spec §5.8), not in agent
    process memory.
 2. **Non-custodial by design.** Escrowed milestone funds live in smart
    contracts and move only through terminal milestones — no admin path
@@ -100,6 +105,7 @@ interface; humans are the payers. Full model:
 docs/        whitepaper, protocol spec, business model, roadmap  ← the product today
 contracts/   Hire402Escrow (Solidity, EVM/Base) — milestone escrow + fees + disputes
              AdvancedEscrow — capital-desk advances: desk-first auto-repayment (Phase 3)
+             BudgetGuard — on-chain spending budgets: holder-set caps, the agent's only money path (v0.3)
 sdk/         TypeScript + Python SDKs (Phase 1)
 registry/    directory + metabolic accounting + reputation API (Phase 1)
 market/      order books for standardized units (Phase 2)
@@ -131,7 +137,7 @@ and Node 20+. The run is PASS when all four assertions hold:
 - ✅ **solvency == SOLVENT** — registry metabolic account (early-solvency rule)
 - ✅ **all event ids present** — every tx recorded in the JSON report
 
-Validated: `forge build` clean, **42/42 Foundry tests green**
+Validated: `forge build` clean, **53/53 Foundry tests green**
 (solc 0.8.24), all packages typecheck, `ops/run-genesis.sh` exit 0 with
 report in `ops/reports/genesis-run-*.json`. Two known contract lint notes
 (ecrecover malleability is irrelevant for single-use approvals;

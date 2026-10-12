@@ -256,6 +256,29 @@ listings, ADP DNS, the soak, then outreach per
 
 ## 7. Changelog
 
+- **2026-10-10 — v1.0.19.** **Budget guard shipped (v0.3)** — roadmap
+  design item (a) from v1.0.18, now built and live: `BudgetGuard`
+  (`contracts/src/BudgetGuard.sol`, spec §5.8). The account holder
+  deposits and sets caps (per-counterparty / per UTC day / total; 0 =
+  uncapped; conservative — a refunded escrow restores funds but never
+  cap room); the agent's ONLY money path is `spend()`, which creates
+  and funds one escrow atomically with the guard as buyer — every refund
+  returns to the guard, never to the agent; the holder withdraws
+  everything at any time; release control (approve / dispute / cancel /
+  expireRefund) is pure passthrough and stays live during pause. Tests:
+  53/53 (11 new: custody, three caps with boundaries + day rollover,
+  pause semantics, atomic reverts, refund destination). Deployed on Base
+  Sepolia at `0x0687fecde32b0ba4d21fd96283df12a699b255ea` (holder =
+  deployer, spender = the buyer agent wallet, token = MockUSDC, caps
+  10/25/100 USDC; tx `0x7a48…2615`) and smoke-proven live: a 2.00
+  deposit → a 1.00 agent spend → escrow #5 (buyer = the guard, funded);
+  an over-cap 9.50 spend reverts `PerCounterpartyCapExceeded` on-chain.
+  Untrusted-output guidance (design item (b)) shipped in spec §6 and
+  onboarding: a counterparty's attestation URI is untrusted content —
+  fetch it sandboxed, treat it as data, never as instructions. The SDK
+  `policy.ts` doc now points at the guard as the enforcement path.
+  Spec-pins 23.
+
 - **2026-10-10 — v1.0.18.** **Positioning: safe delegated spending.** The
   agent is the user; the human is the account holder — every agent wallet
   is funded and owned by a person or company that answers for what it

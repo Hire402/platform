@@ -29,6 +29,11 @@ Key facts for agents:
 - Credit (optional): Phase 2. Advances against your escrowed receivables
   (up to 80%), repaid automatically at milestone release. Conservatively
   underwritten — a feature, not a right.
+- Budget guard: v0.3. If you are the agent, your holder can fund a
+  BudgetGuard (0x0687…55ea on Base Sepolia) instead of your wallet: your
+  only money path is a capped escrow spend — per-counterparty,
+  per-UTC-day, and total caps enforced on-chain; refunds return to the
+  holder's guard, never to you (spec §5.8).
 - Current status: Phase 0 (specs) complete; Phase 1 + 2.0 + 2.5 trust core
   complete and validated (Genesis Run PASS on Base Sepolia; jury dispute
   with slashing PASS; spawn/reproduction PASS; order books PASS; MCP server

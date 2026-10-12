@@ -204,6 +204,35 @@ EscrowCancelled, TreasuryUpdated, DefaultArbiterUpdated`
    interfaces.
 4. `sigExpiry` bounds approval validity; expired approvals revert.
 
+### 5.8 Budget guard (normative reference: `contracts/src/BudgetGuard.sol`, v0.3)
+
+The enforcement half of delegated spending. SDK spending policies
+(`sdk/ts/src/policy.ts`) are advisory process memory — they reset on
+restart and an agent can skip them. The `BudgetGuard` contract is where
+the account holder's limits actually live:
+
+- **Roles.** `holder` — the account holder: deposits, withdraws, sets
+  caps / spender / pause. `spender` — the agent: the only address that
+  can move money, and only through `spend()`. One settlement asset and
+  one escrow address, fixed at construction.
+- **The money path.** `spend(CreateParams)` creates AND funds one escrow
+  atomically, with the guard as the escrow BUYER. Caps are enforced
+  on-chain before the commit: per-counterparty (the escrow seller), per
+  UTC day (`block.timestamp / 1 days` — chain time, not the agent's
+  local timezone), and total. `0` = uncapped.
+- **Refunds never reach the agent.** The guard is the buyer, so every
+  refund returns to the guard; the holder can withdraw everything at
+  any time. The agent's buyer-side release control (`approve`,
+  `dispute`, `cancel`, `expireRefund`) routes through pure passthroughs
+  that are NOT gated by pause — in-flight work stays controllable while
+  new spends are blocked.
+- **Conservative accounting.** A refunded escrow restores funds but NOT
+  cap room: committed spend counts against the caps for life. Re-
+  authorizing is an explicit holder action (`setCaps`).
+- **Views.** `perCounterpartyRemaining` / `perDayRemaining` /
+  `totalRemaining` / `heldBalance` let the agent pre-check; the reverts
+  are the source of truth.
+
 ## 6. Verification & courts
 
 **Phase 1 (normative):** disputes freeze a milestone; the escrow arbiter
@@ -243,6 +272,15 @@ end-to-end: a solvent parent funded a zero-funded child's seed escrow
 (0.50), the child earned from the market (1.40), repaid principal+interest
 via escrow (0.55), and the platform captured a 100 bps incorporation fee —
 `ops/reports/spawn-run-*.json`.
+
+**Untrusted output (guidance, normative for integrators).** A
+counterparty's `attestationURI` points at content THEY chose. Fetched
+into an orchestrator's context, a malicious subcontractor's delivery is
+a prompt-injection channel straight into whoever reads it. Fetch
+delivered work in a sandboxed step and treat it as data — never as
+instructions. Nothing in the protocol requires an orchestrator to trust
+attestation CONTENT; the chain records WHERE the work is, not that it
+is safe to read.
 
 ## 7. Metabolic accounting (normative from Phase 1)
 

@@ -3,9 +3,9 @@
  * enforced in the SDK before an agent commits money to an escrow. They live
  * in process memory — they reset on restart, and a buggy or prompt-injected
  * agent can skip them. Contract-side, funds are only ever committed
- * per-escrow — the policy bounds cumulative spend. On-chain enforcement (a
- * budget guard the account holder controls, not the agent) is the roadmap
- * item that closes this gap.
+ * per-escrow — the policy bounds cumulative spend. On-chain enforcement
+ * is closed by the BudgetGuard contract (spec §5.8): when limits must
+ * hold, fund the guard — not the agent wallet.
  */
 export interface PolicyCaps {
   /** Max cumulative spend toward a single counterparty (base units). */
